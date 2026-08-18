@@ -710,3 +710,185 @@ tbody tr:hover {
     }
 
 }
+
+
+
+/* ==========================================
+   Transaction Network
+========================================== */
+
+.graph-section {
+
+    margin-top: 35px;
+
+    background: #111827;
+
+    border: 1px solid #1e293b;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+}
+
+
+.graph-section .section-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+/* ==========================================
+   Graph
+========================================== */
+
+.transaction-graph {
+
+    width: 100%;
+
+    height: 600px;
+
+    background: #0f172a;
+
+}
+
+
+/* ==========================================
+   Graph Legend
+========================================== */
+
+.graph-legend {
+
+    display: flex;
+
+    gap: 18px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+}
+
+
+.graph-legend span {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+}
+
+
+.legend-dot {
+
+    width: 9px;
+
+    height: 9px;
+
+    border-radius: 50%;
+
+    display: inline-block;
+
+}
+
+
+.high-dot {
+
+    background: #ef4444;
+
+}
+
+
+.medium-dot {
+
+    background: #f59e0b;
+
+}
+
+
+.low-dot {
+
+    background: #22c55e;
+
+}
+
+
+/* ==========================================
+   Graph Information
+========================================== */
+
+.graph-info {
+
+    display: flex;
+
+    gap: 25px;
+
+    padding: 14px 20px;
+
+    border-top: 1px solid #1e293b;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+}
+
+
+/* ==========================================
+   Responsive Graph
+========================================== */
+
+@media (max-width: 800px) {
+
+    .graph-section .section-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+    }
+
+
+    .graph-legend {
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .transaction-graph {
+
+        height: 500px;
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .graph-info {
+
+        flex-direction: column;
+
+        gap: 8px;
+
+    }
+
+
+    .transaction-graph {
+
+        height: 450px;
+
+    }
+
+}

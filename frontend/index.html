@@ -17,6 +17,11 @@
         href="style.css"
     >
 
+    <script
+        type="text/javascript"
+        src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js">
+    </script>
+
 </head>
 
 
@@ -140,6 +145,71 @@
                     <tbody id="wallet-table"></tbody>
 
                 </table>
+
+            </div>
+
+        </section>
+
+            <!-- ======================================
+        Transaction Network
+    ======================================= -->
+
+        <section class="graph-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>Transaction Network</h2>
+
+                    <p>
+                        Interactive visualization of wallet connections
+                    </p>
+
+                </div>
+
+                <div class="graph-legend">
+
+                    <span>
+                        <i class="legend-dot high-dot"></i>
+                        High Risk
+                    </span>
+
+                    <span>
+                        <i class="legend-dot medium-dot"></i>
+                        Medium Risk
+                    </span>
+
+                    <span>
+                        <i class="legend-dot low-dot"></i>
+                        Low Risk
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="transaction-graph"
+                class="transaction-graph"
+            >
+            </div>
+
+
+            <div class="graph-info">
+
+                <span>
+                    🖱 Drag nodes to explore
+                </span>
+
+                <span>
+                    🔍 Scroll to zoom
+                </span>
+
+                <span>
+                    Click a wallet to inspect it
+                </span>
 
             </div>
 
