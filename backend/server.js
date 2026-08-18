@@ -18,7 +18,7 @@ app.use(express.json());
 
 
 // ==========================================
-// Load ML results
+// File Paths
 // ==========================================
 
 const resultsPath = path.join(
@@ -29,6 +29,17 @@ const resultsPath = path.join(
     "ml_results.csv"
 );
 
+const transactionsPath = path.join(
+    __dirname,
+    "..",
+    "data",
+    "transactions.csv"
+);
+
+
+// ==========================================
+// Load ML Results
+// ==========================================
 
 function loadMLResults() {
 
@@ -78,36 +89,94 @@ function loadMLResults() {
 
 
 // ==========================================
-// Home route
+// Load Transactions
+// ==========================================
+
+function loadTransactions() {
+
+    const file = fs.readFileSync(
+        transactionsPath,
+        "utf-8"
+    );
+
+    const lines = file
+        .trim()
+        .split(/\r?\n/);
+
+
+    // Clean CSV headers
+    const headers = lines[0]
+        .split(",")
+        .map(header => header.trim());
+
+
+    const transactions = lines
+        .slice(1)
+        .map(line => {
+
+            // Clean CSV values
+            const values = line
+                .split(",")
+                .map(value => value.trim());
+
+
+            const transaction = {};
+
+
+            headers.forEach((header, index) => {
+
+                transaction[header] = values[index];
+
+            });
+
+
+            return transaction;
+
+        });
+
+
+    return transactions;
+}
+
+
+// ==========================================
+// Home Route
 // ==========================================
 
 app.get("/", (req, res) => {
 
     res.json({
+
         name: "ChainSentry API",
+
         version: "1.0.0",
+
         status: "running"
+
     });
 
 });
 
 
 // ==========================================
-// Health route
+// Health Route
 // ==========================================
 
 app.get("/api/health", (req, res) => {
 
     res.json({
+
         status: "OK",
+
         message: "ChainSentry backend is running"
+
     });
 
 });
 
 
 // ==========================================
-// Get all wallets
+// Get All Wallets
 // ==========================================
 
 app.get("/api/wallets", (req, res) => {
@@ -147,7 +216,7 @@ app.get("/api/wallets", (req, res) => {
 
 
 // ==========================================
-// Get wallet by ID
+// Get Wallet By ID
 // ==========================================
 
 app.get("/api/wallet/:id", (req, res) => {
@@ -200,7 +269,114 @@ app.get("/api/wallet/:id", (req, res) => {
 
 
 // ==========================================
-// Start server
+// Get All Transactions
+// ==========================================
+
+app.get("/api/transactions", (req, res) => {
+
+    try {
+
+        const transactions = loadTransactions();
+
+
+        res.json({
+
+            count: transactions.length,
+
+            transactions: transactions
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading transaction data:",
+            error
+        );
+
+
+        res.status(500).json({
+
+            error: "Unable to load transaction data"
+
+        });
+
+    }
+
+});
+
+
+// ==========================================
+// Get Transactions For A Wallet
+// ==========================================
+
+app.get(
+    "/api/wallet/:id/transactions",
+    (req, res) => {
+
+        try {
+
+            const transactions =
+                loadTransactions();
+
+
+            const walletId =
+                req.params.id;
+
+
+            const walletTransactions =
+                transactions.filter(
+
+                    transaction =>
+
+                        transaction.sender ===
+                            walletId ||
+
+                        transaction.receiver ===
+                            walletId
+
+                );
+
+
+            res.json({
+
+                wallet: walletId,
+
+                count:
+                    walletTransactions.length,
+
+                transactions:
+                    walletTransactions
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Error loading wallet transactions:",
+                error
+            );
+
+
+            res.status(500).json({
+
+                error:
+                    "Unable to load wallet transactions"
+
+            });
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// Start Server
 // ==========================================
 
 app.listen(PORT, () => {
