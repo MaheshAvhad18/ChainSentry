@@ -349,357 +349,521 @@ app.get(
 
 
 // ==========================================
-// Suspicious Wallet Detection
+// Graph-Based Suspicion Analysis
 // ==========================================
 
-app.get("/api/suspicious-wallets", (req, res) => {
+app.get(
+    "/api/graph-analysis",
+    (req, res) => {
 
-    try {
+        try {
 
-        const wallets = loadMLResults();
+            const wallets =
+                loadMLResults();
 
-        const transactions = loadTransactions();
-
-
-        // --------------------------------------
-        // Create transaction statistics
-        // --------------------------------------
-
-        const transactionStats = new Map();
+            const transactions =
+                loadTransactions();
 
 
-        wallets.forEach(wallet => {
+            // ==================================
+            // Initialize wallet graph data
+            // ==================================
 
-            transactionStats.set(
+            const graphData =
+                new Map();
 
-                wallet.wallet,
 
-                {
+            wallets.forEach(wallet => {
 
-                    largeTransactions: 0,
+                graphData.set(
 
-                    connectedWallets: new Set(),
+                    wallet.wallet,
 
-                    highRiskConnections: new Set(),
+                    {
 
-                    totalVolume: 0
+                        wallet:
+                            wallet.wallet,
+
+                        mlRiskScore:
+                            Number(
+                                wallet.risk_score
+                            ),
+
+                        mlRiskLevel:
+                            wallet.risk_level,
+
+                        incomingTransactions: 0,
+
+                        outgoingTransactions: 0,
+
+                        incomingVolume: 0,
+
+                        outgoingVolume: 0,
+
+                        connectedWallets: new Set(),
+
+                        incomingWallets: new Set(),
+
+                        outgoingWallets: new Set(),
+
+                        largeTransactions: 0,
+
+                        reciprocalTransactions: 0,
+
+                        reciprocalWallets: new Set()
+
+                    }
+
+                );
+
+            });
+
+
+            // ==================================
+            // Analyze transaction graph
+            // ==================================
+
+            transactions.forEach(transaction => {
+
+                const sender =
+                    transaction.sender;
+
+                const receiver =
+                    transaction.receiver;
+
+                const amount =
+                    Number(
+                        transaction.amount
+                    );
+
+
+                if (
+                    !graphData.has(sender) ||
+                    !graphData.has(receiver)
+                ) {
+
+                    return;
 
                 }
 
-            );
 
-        });
+                const senderData =
+                    graphData.get(sender);
 
-
-        // --------------------------------------
-        // Analyze transactions
-        // --------------------------------------
-
-        transactions.forEach(transaction => {
-
-            const sender =
-                transaction.sender;
-
-            const receiver =
-                transaction.receiver;
-
-            const amount =
-                Number(transaction.amount);
+                const receiverData =
+                    graphData.get(receiver);
 
 
-            if (
-                !transactionStats.has(sender)
-            ) {
+                // --------------------------------
+                // Transaction counts
+                // --------------------------------
 
-                transactionStats.set(
-                    sender,
-                    {
-                        largeTransactions: 0,
-                        connectedWallets: new Set(),
-                        highRiskConnections: new Set(),
-                        totalVolume: 0
-                    }
+                senderData.outgoingTransactions++;
+
+                receiverData.incomingTransactions++;
+
+
+                // --------------------------------
+                // Transaction volume
+                // --------------------------------
+
+                senderData.outgoingVolume +=
+                    amount;
+
+                receiverData.incomingVolume +=
+                    amount;
+
+
+                // --------------------------------
+                // Connections
+                // --------------------------------
+
+                senderData.connectedWallets.add(
+                    receiver
                 );
 
-            }
-
-
-            if (
-                !transactionStats.has(receiver)
-            ) {
-
-                transactionStats.set(
-                    receiver,
-                    {
-                        largeTransactions: 0,
-                        connectedWallets: new Set(),
-                        highRiskConnections: new Set(),
-                        totalVolume: 0
-                    }
-                );
-
-            }
-
-
-            const senderStats =
-                transactionStats.get(sender);
-
-            const receiverStats =
-                transactionStats.get(receiver);
-
-
-            // Transaction volume
-
-            senderStats.totalVolume += amount;
-
-            receiverStats.totalVolume += amount;
-
-
-            // Wallet connections
-
-            senderStats.connectedWallets.add(
-                receiver
-            );
-
-            receiverStats.connectedWallets.add(
-                sender
-            );
-
-
-            // Large transaction
-
-            if (amount >= 10000) {
-
-                senderStats.largeTransactions++;
-
-                receiverStats.largeTransactions++;
-
-            }
-
-        });
-
-
-        // --------------------------------------
-        // Wallet lookup
-        // --------------------------------------
-
-        const walletMap = new Map();
-
-        wallets.forEach(wallet => {
-
-            walletMap.set(
-                wallet.wallet,
-                wallet
-            );
-
-        });
-
-
-        // --------------------------------------
-        // Detect suspicious wallets
-        // --------------------------------------
-
-        const suspiciousWallets = [];
-
-
-        wallets.forEach(wallet => {
-
-            const stats =
-                transactionStats.get(
-                    wallet.wallet
+                receiverData.connectedWallets.add(
+                    sender
                 );
 
 
-            const riskScore =
-                Number(wallet.risk_score);
-
-
-            const reasons = [];
-
-
-            // Signal 1: ML risk
-
-            if (
-                wallet.risk_level === "HIGH"
-            ) {
-
-                reasons.push(
-                    "High ML risk level"
+                senderData.outgoingWallets.add(
+                    receiver
                 );
 
-            }
-
-            else if (
-                riskScore >= 70
-            ) {
-
-                reasons.push(
-                    "High ML risk score"
+                receiverData.incomingWallets.add(
+                    sender
                 );
 
-            }
+
+                // --------------------------------
+                // Large transaction
+                // --------------------------------
+
+                if (
+                    amount >= 10000
+                ) {
+
+                    senderData.largeTransactions++;
+
+                    receiverData.largeTransactions++;
+
+                }
+
+            });
 
 
-            // Signal 2: Large transactions
+            // ==================================
+            // Detect reciprocal transactions
+            // ==================================
 
-            if (
-                stats &&
-                stats.largeTransactions > 0
-            ) {
+            graphData.forEach(walletData => {
 
-                reasons.push(
-                    `${stats.largeTransactions} large transaction(s)`
-                );
+                walletData.outgoingWallets
+                    .forEach(otherWallet => {
 
-            }
-
-
-            // Signal 3: High transaction volume
-
-            if (
-                stats &&
-                stats.totalVolume >= 30000
-            ) {
-
-                reasons.push(
-                    "High transaction volume"
-                );
-
-            }
-
-
-            // Signal 4: High-risk connections
-
-            if (stats) {
-
-                stats.connectedWallets.forEach(
-                    connectedWallet => {
-
-                        const connected =
-                            walletMap.get(
-                                connectedWallet
+                        const otherData =
+                            graphData.get(
+                                otherWallet
                             );
 
 
                         if (
-                            connected &&
-                            connected.risk_level ===
-                                "HIGH"
+                            otherData &&
+                            otherData.outgoingWallets
+                                .has(
+                                    walletData.wallet
+                                )
                         ) {
 
-                            stats.highRiskConnections.add(
-                                connectedWallet
-                            );
+                            walletData
+                                .reciprocalWallets
+                                .add(
+                                    otherWallet
+                                );
 
                         }
 
-                    }
-                );
-
-            }
+                    });
 
 
-            if (
-                stats &&
-                stats.highRiskConnections.size > 0
-            ) {
+                walletData.reciprocalTransactions =
+                    walletData
+                        .reciprocalWallets
+                        .size;
 
-                reasons.push(
-                    `Connected to ${stats.highRiskConnections.size} high-risk wallet(s)`
-                );
-
-            }
+            });
 
 
-            // ----------------------------------
-            // Add wallet if suspicious
-            // ----------------------------------
+            // ==================================
+            // Calculate Graph Suspicion Score
+            // ==================================
 
-            if (
-                reasons.length > 0
-            ) {
+            const analysis = [];
 
-                suspiciousWallets.push({
+
+            graphData.forEach(walletData => {
+
+                const mlScore =
+                    walletData.mlRiskScore;
+
+
+                // --------------------------------
+                // Large transaction signal
+                // --------------------------------
+
+                const largeTxScore =
+                    Math.min(
+                        100,
+                        walletData
+                            .largeTransactions * 25
+                    );
+
+
+                // --------------------------------
+                // Connection signal
+                // --------------------------------
+
+                const connectionScore =
+                    Math.min(
+                        100,
+                        walletData
+                            .connectedWallets
+                            .size * 15
+                    );
+
+
+                // --------------------------------
+                // Reciprocal transfer signal
+                // --------------------------------
+
+                const reciprocalScore =
+                    Math.min(
+                        100,
+                        walletData
+                            .reciprocalTransactions * 30
+                    );
+
+
+                // --------------------------------
+                // Volume signal
+                // --------------------------------
+
+                const totalVolume =
+                    walletData.incomingVolume +
+                    walletData.outgoingVolume;
+
+
+                const volumeScore =
+                    Math.min(
+                        100,
+                        (totalVolume / 50000) * 100
+                    );
+
+
+                // --------------------------------
+                // Graph score
+                // --------------------------------
+
+                const graphScore =
+
+                    (
+                        largeTxScore * 0.30
+                    ) +
+
+                    (
+                        connectionScore * 0.20
+                    ) +
+
+                    (
+                        reciprocalScore * 0.30
+                    ) +
+
+                    (
+                        volumeScore * 0.20
+                    );
+
+
+                // --------------------------------
+                // Combined score
+                // --------------------------------
+
+                const combinedScore =
+
+                    (
+                        mlScore * 0.60
+                    ) +
+
+                    (
+                        graphScore * 0.40
+                    );
+
+
+                let riskLevel = "LOW";
+
+
+                if (
+                    combinedScore >= 70
+                ) {
+
+                    riskLevel = "HIGH";
+
+                }
+
+                else if (
+                    combinedScore >= 40
+                ) {
+
+                    riskLevel = "MEDIUM";
+
+                }
+
+
+                // --------------------------------
+                // Suspicion reasons
+                // --------------------------------
+
+                const reasons = [];
+
+
+                if (
+                    mlScore >= 70
+                ) {
+
+                    reasons.push(
+                        "High ML anomaly score"
+                    );
+
+                }
+
+
+                if (
+                    walletData
+                        .largeTransactions > 0
+                ) {
+
+                    reasons.push(
+
+                        `${walletData.largeTransactions} large transaction(s)`
+
+                    );
+
+                }
+
+
+                if (
+                    walletData
+                        .reciprocalTransactions > 0
+                ) {
+
+                    reasons.push(
+
+                        `Reciprocal transfers with ${walletData.reciprocalTransactions} wallet(s)`
+
+                    );
+
+                }
+
+
+                if (
+                    walletData
+                        .connectedWallets
+                        .size >= 3
+                ) {
+
+                    reasons.push(
+
+                        "Highly connected wallet"
+
+                    );
+
+                }
+
+
+                if (
+                    totalVolume >= 30000
+                ) {
+
+                    reasons.push(
+
+                        "High transaction volume"
+
+                    );
+
+                }
+
+
+                analysis.push({
 
                     wallet:
-                        wallet.wallet,
+                        walletData.wallet,
 
-                    risk_score:
-                        riskScore,
+                    ml_risk_score:
+                        Number(
+                            mlScore.toFixed(2)
+                        ),
+
+                    graph_suspicion_score:
+                        Number(
+                            graphScore.toFixed(2)
+                        ),
+
+                    combined_risk_score:
+                        Number(
+                            combinedScore.toFixed(2)
+                        ),
 
                     risk_level:
-                        wallet.risk_level,
+                        riskLevel,
 
-                    total_transactions:
+                    incoming_transactions:
+                        walletData
+                            .incomingTransactions,
+
+                    outgoing_transactions:
+                        walletData
+                            .outgoingTransactions,
+
+                    incoming_volume:
                         Number(
-                            wallet.total_transactions
+                            walletData
+                                .incomingVolume
+                                .toFixed(2)
                         ),
 
-                    total_volume:
+                    outgoing_volume:
                         Number(
-                            stats?.totalVolume || 0
+                            walletData
+                                .outgoingVolume
+                                .toFixed(2)
                         ),
-
-                    large_transactions:
-                        stats?.largeTransactions || 0,
 
                     connections:
-                        stats
-                            ? stats.connectedWallets.size
-                            : 0,
+                        walletData
+                            .connectedWallets
+                            .size,
+
+                    large_transactions:
+                        walletData
+                            .largeTransactions,
+
+                    reciprocal_wallets:
+                        walletData
+                            .reciprocalWallets
+                            .size,
 
                     suspicion_reasons:
                         reasons
 
                 });
 
-            }
-
-        });
+            });
 
 
-        // --------------------------------------
-        // Sort by risk score
-        // --------------------------------------
+            // ==================================
+            // Sort by combined risk
+            // ==================================
 
-        suspiciousWallets.sort(
+            analysis.sort(
 
-            (a, b) =>
-                b.risk_score -
-                a.risk_score
+                (a, b) =>
 
-        );
+                    b.combined_risk_score -
+                    a.combined_risk_score
+
+            );
 
 
-        res.json({
+            res.json({
 
-            count:
-                suspiciousWallets.length,
+                count:
+                    analysis.length,
 
-            wallets:
-                suspiciousWallets
+                wallets:
+                    analysis
 
-        });
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Error performing graph analysis:",
+                error
+            );
+
+            res.status(500).json({
+
+                error:
+                    "Unable to perform graph analysis"
+
+            });
+
+        }
 
     }
-
-    catch (error) {
-
-        console.error(
-            "Error detecting suspicious wallets:",
-            error
-        );
-
-        res.status(500).json({
-
-            error:
-                "Unable to detect suspicious wallets"
-
-        });
-
-    }
-
-});
+);
 
 
 // ==========================================
