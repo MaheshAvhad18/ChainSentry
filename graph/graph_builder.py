@@ -45,7 +45,6 @@ def build_transaction_graph(csv_path):
 
 
 if __name__ == "__main__":
-
     csv_path = "data/transactions.csv"
 
     transaction_graph = build_transaction_graph(csv_path)
@@ -64,7 +63,6 @@ if __name__ == "__main__":
     print("\nConnections:")
 
     for sender, receiver, data in transaction_graph.edges(data=True):
-
         print(
             f"{sender} → {receiver} | "
             f"Amount: {data['amount']} | "

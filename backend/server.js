@@ -39,18 +39,27 @@ function loadMLResults() {
 
     const lines = file
         .trim()
-        .split("\n");
+        .split(/\r?\n/);
 
+
+    // Clean CSV headers
     const headers = lines[0]
-        .split(",");
+        .split(",")
+        .map(header => header.trim());
+
 
     const results = lines
         .slice(1)
         .map(line => {
 
-            const values = line.split(",");
+            // Clean CSV values
+            const values = line
+                .split(",")
+                .map(value => value.trim());
+
 
             const wallet = {};
+
 
             headers.forEach((header, index) => {
 
@@ -58,9 +67,11 @@ function loadMLResults() {
 
             });
 
+
             return wallet;
 
         });
+
 
     return results;
 }
@@ -105,15 +116,29 @@ app.get("/api/wallets", (req, res) => {
 
         const wallets = loadMLResults();
 
+
         res.json({
+
             count: wallets.length,
+
             wallets: wallets
+
         });
 
-    } catch (error) {
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading wallet data:",
+            error
+        );
+
 
         res.status(500).json({
+
             error: "Unable to load wallet data"
+
         });
 
     }
@@ -131,24 +156,42 @@ app.get("/api/wallet/:id", (req, res) => {
 
         const wallets = loadMLResults();
 
+
         const wallet = wallets.find(
-            item => item.wallet === req.params.id
+
+            item =>
+                item.wallet === req.params.id
+
         );
+
 
         if (!wallet) {
 
             return res.status(404).json({
+
                 error: "Wallet not found"
+
             });
 
         }
 
+
         res.json(wallet);
 
-    } catch (error) {
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading wallet data:",
+            error
+        );
+
 
         res.status(500).json({
+
             error: "Unable to load wallet data"
+
         });
 
     }

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ChainSentry</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <header>
+
+        <div class="header-content">
+
+            <div>
+                <h1>ChainSentry</h1>
+
+                <p>
+                    AI-Powered Blockchain Transaction Risk Analyzer
+                </p>
+            </div>
+
+            <div class="status">
+                ● API Connected
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- Statistics -->
+
+        <section class="stats">
+
+            <div class="card">
+
+                <h3>Total Wallets</h3>
+
+                <p id="total-wallets">
+                    -
+                </p>
+
+            </div>
+
+
+            <div class="card high">
+
+                <h3>High Risk</h3>
+
+                <p id="high-risk">
+                    -
+                </p>
+
+            </div>
+
+
+            <div class="card medium">
+
+                <h3>Medium Risk</h3>
+
+                <p id="medium-risk">
+                    -
+                </p>
+
+            </div>
+
+
+            <div class="card low">
+
+                <h3>Low Risk</h3>
+
+                <p id="low-risk">
+                    -
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Wallet Analysis -->
+
+        <section class="wallet-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>Wallet Risk Analysis</h2>
+
+                    <p>
+                        Behavioral analysis of blockchain wallets
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Wallet</th>
+
+                            <th>Transactions</th>
+
+                            <th>Incoming</th>
+
+                            <th>Outgoing</th>
+
+                            <th>Connections</th>
+
+                            <th>Risk Score</th>
+
+                            <th>Risk Level</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="wallet-table">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
