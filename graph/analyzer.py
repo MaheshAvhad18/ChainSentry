@@ -85,3 +85,10 @@ if __name__ == "__main__":
     print("==========================")
 
     print(features.to_string(index=False))
+
+    # Save features for ML
+    output_path = "ml/data/wallet_features.csv"
+
+    features.to_csv(output_path, index=False)
+
+    print(f"\nML dataset saved to: {output_path}")
