@@ -101,7 +101,7 @@
 
 
         <!-- ======================================
-             Wallet Analysis
+             Wallet Risk Analysis
         ======================================= -->
 
         <section class="wallet-section">
@@ -151,8 +151,8 @@
         </section>
 
 
-                <!-- ======================================
-            Suspicious Wallets
+        <!-- ======================================
+             Graph-Based Suspicious Wallets
         ======================================= -->
 
         <section class="suspicious-section">
@@ -164,7 +164,7 @@
                     <h2>⚠ Suspicious Wallets</h2>
 
                     <p>
-                        Wallets requiring further investigation
+                        Combined ML and graph-based risk analysis
                     </p>
 
                 </div>
@@ -189,15 +189,19 @@
 
                             <th>Wallet</th>
 
-                            <th>Risk Score</th>
+                            <th>ML Risk</th>
+
+                            <th>Graph Score</th>
+
+                            <th>Combined Risk</th>
 
                             <th>Risk Level</th>
 
-                            <th>Transaction Volume</th>
-
-                            <th>Large Transactions</th>
-
                             <th>Connections</th>
+
+                            <th>Large Txns</th>
+
+                            <th>Reciprocal</th>
 
                             <th>Detection Signals</th>
 
@@ -206,9 +210,7 @@
                     </thead>
 
 
-                    <tbody
-                        id="suspicious-table"
-                    >
+                    <tbody id="suspicious-table">
 
                     </tbody>
 
@@ -218,9 +220,10 @@
 
         </section>
 
-            <!-- ======================================
-        Transaction Network
-    ======================================= -->
+
+        <!-- ======================================
+             Transaction Network
+        ======================================= -->
 
         <section class="graph-section">
 
@@ -236,21 +239,33 @@
 
                 </div>
 
+
                 <div class="graph-legend">
 
                     <span>
+
                         <i class="legend-dot high-dot"></i>
+
                         High Risk
+
                     </span>
 
+
                     <span>
+
                         <i class="legend-dot medium-dot"></i>
+
                         Medium Risk
+
                     </span>
 
+
                     <span>
+
                         <i class="legend-dot low-dot"></i>
+
                         Low Risk
+
                     </span>
 
                 </div>
@@ -297,7 +312,7 @@
 
         <div class="modal-content">
 
-            <!-- Header -->
+            <!-- Modal Header -->
 
             <div class="modal-header">
 
@@ -329,6 +344,7 @@
                     id="close-details"
                     class="close-button"
                     type="button"
+                    aria-label="Close wallet details"
                 >
                     ×
                 </button>
