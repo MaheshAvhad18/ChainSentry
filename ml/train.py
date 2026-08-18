@@ -57,23 +57,43 @@ data["anomaly_score"] = scores
 #  1  = normal
 # -1  = anomaly
 
-data["risk_level"] = data["anomaly"].apply(
-    lambda x: "HIGH" if x == -1 else "LOW"
-)
+# Convert anomaly score into a 0-100 risk score
+min_score = scores.min()
+max_score = scores.max()
+
+data["risk_score"] = (
+    100 * (max_score - data["anomaly_score"])
+    / (max_score - min_score)
+).round(2)
+
+
+# Classify risk level
+def classify_risk(score):
+
+    if score >= 70:
+        return "HIGH"
+
+    elif score >= 40:
+        return "MEDIUM"
+
+    else:
+        return "LOW"
+
+
+data["risk_level"] = data["risk_score"].apply(classify_risk)
 
 
 # Display results
-print("\nChainSentry ML Analysis")
-print("=======================")
-
 results = data[
     [
         "wallet",
-        "anomaly_score",
-        "risk_level"
+        "risk_score",
+        "risk_level",
+        "anomaly_score"
     ]
 ].sort_values(
-    by="anomaly_score"
+    by="risk_score",
+    ascending=False
 )
 
 print(results.to_string(index=False))
