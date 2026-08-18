@@ -22,16 +22,22 @@
 
 <body>
 
+    <!-- ======================================
+         Header
+    ======================================= -->
+
     <header>
 
         <div class="header-content">
 
             <div>
+
                 <h1>ChainSentry</h1>
 
                 <p>
                     AI-Powered Blockchain Transaction Risk Analyzer
                 </p>
+
             </div>
 
             <div class="status">
@@ -45,7 +51,9 @@
 
     <main>
 
-        <!-- Statistics -->
+        <!-- ======================================
+             Statistics
+        ======================================= -->
 
         <section class="stats">
 
@@ -53,9 +61,7 @@
 
                 <h3>Total Wallets</h3>
 
-                <p id="total-wallets">
-                    -
-                </p>
+                <p id="total-wallets">-</p>
 
             </div>
 
@@ -64,9 +70,7 @@
 
                 <h3>High Risk</h3>
 
-                <p id="high-risk">
-                    -
-                </p>
+                <p id="high-risk">-</p>
 
             </div>
 
@@ -75,9 +79,7 @@
 
                 <h3>Medium Risk</h3>
 
-                <p id="medium-risk">
-                    -
-                </p>
+                <p id="medium-risk">-</p>
 
             </div>
 
@@ -86,16 +88,16 @@
 
                 <h3>Low Risk</h3>
 
-                <p id="low-risk">
-                    -
-                </p>
+                <p id="low-risk">-</p>
 
             </div>
 
         </section>
 
 
-        <!-- Wallet Analysis -->
+        <!-- ======================================
+             Wallet Analysis
+        ======================================= -->
 
         <section class="wallet-section">
 
@@ -106,7 +108,7 @@
                     <h2>Wallet Risk Analysis</h2>
 
                     <p>
-                        Behavioral analysis of blockchain wallets
+                        Click a wallet to view detailed activity
                     </p>
 
                 </div>
@@ -123,17 +125,11 @@
                         <tr>
 
                             <th>Wallet</th>
-
                             <th>Transactions</th>
-
                             <th>Incoming</th>
-
                             <th>Outgoing</th>
-
                             <th>Connections</th>
-
                             <th>Risk Score</th>
-
                             <th>Risk Level</th>
 
                         </tr>
@@ -141,9 +137,7 @@
                     </thead>
 
 
-                    <tbody id="wallet-table">
-
-                    </tbody>
+                    <tbody id="wallet-table"></tbody>
 
                 </table>
 
@@ -152,6 +146,188 @@
         </section>
 
     </main>
+
+
+    <!-- ==========================================
+         Wallet Details Modal
+    =========================================== -->
+
+    <div
+        id="wallet-details"
+        class="modal hidden"
+    >
+
+        <div class="modal-content">
+
+            <!-- Header -->
+
+            <div class="modal-header">
+
+                <div>
+
+                    <div class="wallet-title-row">
+
+                        <h2 id="details-wallet">
+                            Wallet
+                        </h2>
+
+                        <span
+                            id="details-risk-badge"
+                            class="badge"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                    <p>
+                        Detailed wallet analysis
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="close-details"
+                    class="close-button"
+                    type="button"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- Wallet Metrics -->
+
+            <div class="details-stats">
+
+                <div class="detail-card">
+
+                    <span>Risk Score</span>
+
+                    <strong id="details-risk-score">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span>Risk Level</span>
+
+                    <strong id="details-risk-level">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span>Total Transactions</span>
+
+                    <strong id="details-transactions">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span>Total Incoming</span>
+
+                    <strong id="details-incoming">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span>Total Outgoing</span>
+
+                    <strong id="details-outgoing">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-card">
+
+                    <span>Connections</span>
+
+                    <strong id="details-connections">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- Transaction History -->
+
+            <div class="transactions">
+
+                <div class="transaction-header">
+
+                    <div>
+
+                        <h3>
+                            Transaction History
+                        </h3>
+
+                        <p>
+                            Transactions involving this wallet
+                        </p>
+
+                    </div>
+
+                    <span
+                        id="transaction-count"
+                        class="transaction-count"
+                    >
+                        0 transactions
+                    </span>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+                                <th>Sender</th>
+                                <th>Receiver</th>
+                                <th>Amount</th>
+                                <th>Timestamp</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="transaction-table"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 
     <script src="script.js"></script>
