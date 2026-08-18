@@ -13,16 +13,6 @@ async function loadWallets() {
             `${API_URL}/api/wallets`
         );
 
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Failed to fetch wallets"
-            );
-
-        }
-
-
         const data = await response.json();
 
         const wallets = data.wallets;
@@ -133,11 +123,9 @@ async function loadWallets() {
 
                     </td>
 
-
                     <td>
                         ${wallet.total_transactions}
                     </td>
-
 
                     <td>
                         ${Number(
@@ -145,18 +133,15 @@ async function loadWallets() {
                         ).toFixed(2)}
                     </td>
 
-
                     <td>
                         ${Number(
                             wallet.total_outgoing
                         ).toFixed(2)}
                     </td>
 
-
                     <td>
                         ${wallet.unique_connections}
                     </td>
-
 
                     <td>
 
@@ -167,7 +152,6 @@ async function loadWallets() {
                         </strong>
 
                     </td>
-
 
                     <td>
 
@@ -180,22 +164,18 @@ async function loadWallets() {
                         </span>
 
                     </td>
-
                 `;
 
 
-                // Attach click event
-
+                // Attach click event properly
                 row.querySelector(
                     ".wallet-button"
                 ).addEventListener(
                     "click",
                     () => {
-
                         showWalletDetails(
                             wallet.wallet
                         );
-
                     }
                 );
 
@@ -313,7 +293,8 @@ async function showWalletDetails(walletId) {
         ).textContent =
             Number(
                 wallet.total_outgoing
-            ).toFixed(2);
+            ).toFixed(2
+            );
 
 
         // ======================================
@@ -403,23 +384,19 @@ async function showWalletDetails(walletId) {
                         ${transaction.transaction_id}
                     </td>
 
-
                     <td>
                         ${transaction.sender}
                     </td>
 
-
                     <td>
                         ${transaction.receiver}
                     </td>
-
 
                     <td>
                         ${Number(
                             transaction.amount
                         ).toFixed(2)}
                     </td>
-
 
                     <td>
                         ${transaction.timestamp}
@@ -546,638 +523,594 @@ document.addEventListener(
 
 
 // ==========================================
+// Start Application
+// ==========================================
+
+// ==========================================
 // Load Transaction Graph
 // ==========================================
 
-async function loadTransactionGraph() {
+// ==========================================
+// Load Transaction Graph
+// ==========================================
 
-    try {
+    async function loadTransactionGraph() {
 
-        // ======================================
-        // Fetch Transactions
-        // ======================================
+        try {
 
-        const transactionResponse =
-            await fetch(
-                `${API_URL}/api/transactions`
-            );
+            // ======================================
+            // Fetch Transactions
+            // ======================================
 
-
-        if (!transactionResponse.ok) {
-
-            throw new Error(
-                "Failed to fetch transactions"
-            );
-
-        }
+            const transactionResponse =
+                await fetch(
+                    `${API_URL}/api/transactions`
+                );
 
 
-        const transactionData =
-            await transactionResponse.json();
+            if (!transactionResponse.ok) {
 
-
-        // ======================================
-        // Fetch Wallet Risk Data
-        // ======================================
-
-        const walletResponse =
-            await fetch(
-                `${API_URL}/api/wallets`
-            );
-
-
-        if (!walletResponse.ok) {
-
-            throw new Error(
-                "Failed to fetch wallets"
-            );
-
-        }
-
-
-        const walletData =
-            await walletResponse.json();
-
-
-        const wallets =
-            walletData.wallets;
-
-
-        // ======================================
-        // Wallet Lookup
-        // ======================================
-
-        const walletMap =
-            new Map();
-
-
-        wallets.forEach(wallet => {
-
-            walletMap.set(
-                wallet.wallet,
-                wallet
-            );
-
-        });
-
-
-        // ======================================
-        // Create Nodes
-        // ======================================
-
-        const nodes = [];
-
-
-        walletMap.forEach(wallet => {
-
-            let nodeColor =
-                "#22c55e";
-
-
-            if (
-                wallet.risk_level === "HIGH"
-            ) {
-
-                nodeColor =
-                    "#ef4444";
-
-            }
-
-            else if (
-                wallet.risk_level === "MEDIUM"
-            ) {
-
-                nodeColor =
-                    "#f59e0b";
+                throw new Error(
+                    "Failed to fetch transactions"
+                );
 
             }
 
 
-            let nodeSize =
-                22;
+            const transactionData =
+                await transactionResponse.json();
 
 
-            if (
-                wallet.risk_level === "HIGH"
-            ) {
+            // ======================================
+            // Fetch Wallet Risk Data
+            // ======================================
 
-                nodeSize =
-                    32;
+            const walletResponse =
+                await fetch(
+                    `${API_URL}/api/wallets`
+                );
+
+
+            if (!walletResponse.ok) {
+
+                throw new Error(
+                    "Failed to fetch wallets"
+                );
 
             }
 
-            else if (
-                wallet.risk_level === "MEDIUM"
-            ) {
 
-                nodeSize =
-                    27;
-
-            }
+            const walletData =
+                await walletResponse.json();
 
 
-            nodes.push({
+            const wallets =
+                walletData.wallets;
 
-                id:
+
+            // ======================================
+            // Wallet Lookup
+            // ======================================
+
+            const walletMap =
+                new Map();
+
+
+            wallets.forEach(wallet => {
+
+                walletMap.set(
                     wallet.wallet,
-
-                label:
-                    wallet.wallet,
-
-                title:
-                    `<b>${wallet.wallet}</b><br>
-                    Risk Score: ${wallet.risk_score}<br>
-                    Risk Level: ${wallet.risk_level}<br>
-                    Transactions: ${wallet.total_transactions}<br>
-                    Connections: ${wallet.unique_connections}`,
-
-                size:
-                    nodeSize,
-
-                color: {
-
-                    background:
-                        nodeColor,
-
-                    border:
-                        "#e2e8f0",
-
-                    highlight: {
-
-                        background:
-                            "#ffffff",
-
-                        border:
-                            nodeColor
-
-                    }
-
-                },
-
-                borderWidth:
-                    2,
-
-                font: {
-
-                    color:
-                        "#ffffff",
-
-                    size:
-                        14,
-
-                    face:
-                        "Arial",
-
-                    bold:
-                        true
-
-                },
-
-                shadow: {
-
-                    enabled:
-                        true,
-
-                    color:
-                        nodeColor,
-
-                    size:
-                        12,
-
-                    x:
-                        0,
-
-                    y:
-                        0
-
-                }
+                    wallet
+                );
 
             });
 
-        });
+
+            // ======================================
+            // Create Nodes
+            // ======================================
+
+            const nodes = [];
 
 
-        // ======================================
-        // Create Edges
-        // ======================================
+            walletMap.forEach(wallet => {
 
-        const edges = [];
-
-
-        transactionData.transactions.forEach(
-            (transaction, index) => {
-
-                const amount =
-                    Number(
-                        transaction.amount
-                    );
-
-
-                const isLargeTransaction =
-                    amount >= 10000;
-
-
-                let edgeColor =
-                    "#475569";
-
-
-                let edgeWidth =
-                    Math.max(
-                        1,
-                        Math.min(
-                            5,
-                            amount / 3000
-                        )
-                    );
+                let nodeColor = "#22c55e";
 
 
                 if (
-                    isLargeTransaction
+                    wallet.risk_level === "HIGH"
                 ) {
 
-                    edgeColor =
-                        "#ef4444";
+                    nodeColor = "#ef4444";
 
-                    edgeWidth =
-                        Math.max(
-                            3,
-                            Math.min(
-                                8,
-                                amount / 2500
-                            )
-                        );
+                }
+
+                else if (
+                    wallet.risk_level === "MEDIUM"
+                ) {
+
+                    nodeColor = "#f59e0b";
 
                 }
 
 
-                edges.push({
+                // Increase size for high-risk wallets
 
-                    id:
-                        index,
+                let nodeSize = 22;
 
-                    from:
-                        transaction.sender,
 
-                    to:
-                        transaction.receiver,
+                if (
+                    wallet.risk_level === "HIGH"
+                ) {
 
-                    label:
-                        amount >= 1000
-                            ? `${(
-                                amount / 1000
-                            ).toFixed(1)}K`
-                            : amount.toFixed(0),
+                    nodeSize = 32;
 
-                    arrows: {
+                }
 
-                        to: {
+                else if (
+                    wallet.risk_level === "MEDIUM"
+                ) {
 
-                            enabled:
-                                true,
+                    nodeSize = 27;
 
-                            scaleFactor:
-                                0.7
+                }
+
+
+                nodes.push({
+
+                    id: wallet.wallet,
+
+                    label: wallet.wallet,
+
+                    title:
+                        `<b>${wallet.wallet}</b><br>
+                        Risk Score: ${wallet.risk_score}<br>
+                        Risk Level: ${wallet.risk_level}<br>
+                        Transactions: ${wallet.total_transactions}<br>
+                        Connections: ${wallet.unique_connections}`,
+
+                    size: nodeSize,
+
+                    color: {
+
+                        background: nodeColor,
+
+                        border: "#e2e8f0",
+
+                        highlight: {
+
+                            background: "#ffffff",
+
+                            border: nodeColor
 
                         }
 
                     },
 
-                    width:
-                        edgeWidth,
-
-                    color: {
-
-                        color:
-                            edgeColor,
-
-                        highlight:
-                            "#60a5fa",
-
-                        hover:
-                            "#93c5fd"
-
-                    },
-
-                    title:
-                        `<b>Transaction</b><br>
-                        ${transaction.sender}
-                        →
-                        ${transaction.receiver}<br>
-                        Amount: ${amount.toFixed(2)}<br>
-                        Time: ${transaction.timestamp}`,
+                    borderWidth: 2,
 
                     font: {
 
-                        color:
-                            "#94a3b8",
+                        color: "#ffffff",
 
-                        size:
-                            10,
+                        size: 14,
 
-                        strokeWidth:
-                            0
+                        face: "Arial",
+
+                        bold: true
 
                     },
 
-                    smooth: {
+                    shadow: {
 
-                        type:
-                            "curvedCW",
+                        enabled: true,
 
-                        roundness:
-                            0.15
+                        color: nodeColor,
+
+                        size: 12,
+
+                        x: 0,
+
+                        y: 0
 
                     }
 
                 });
 
-            }
-        );
+            });
 
 
-        // ======================================
-        // Graph Container
-        // ======================================
+            // ======================================
+            // Create Edges
+            // ======================================
 
-        const container =
-            document.getElementById(
-                "transaction-graph"
+            const edges = [];
+
+
+            transactionData.transactions.forEach(
+                (transaction, index) => {
+
+                    const amount =
+                        Number(
+                            transaction.amount
+                        );
+
+
+                    /*
+                    * Large transactions are treated
+                    * as potentially suspicious.
+                    */
+
+                    const isLargeTransaction =
+                        amount >= 10000;
+
+
+                    let edgeColor =
+                        "#475569";
+
+
+                    let edgeWidth =
+                        Math.max(
+                            1,
+                            Math.min(
+                                5,
+                                amount / 3000
+                            )
+                        );
+
+
+                    if (
+                        isLargeTransaction
+                    ) {
+
+                        edgeColor =
+                            "#ef4444";
+
+                        edgeWidth =
+                            Math.max(
+                                3,
+                                Math.min(
+                                    8,
+                                    amount / 2500
+                                )
+                            );
+
+                    }
+
+
+                    edges.push({
+
+                        id: index,
+
+                        from:
+                            transaction.sender,
+
+                        to:
+                            transaction.receiver,
+
+                        label:
+                            amount >= 1000
+                                ? `${(amount / 1000).toFixed(1)}K`
+                                : amount.toFixed(0),
+
+                        arrows: {
+
+                            to: {
+
+                                enabled: true,
+
+                                scaleFactor: 0.7
+
+                            }
+
+                        },
+
+                        width: edgeWidth,
+
+                        color: {
+
+                            color: edgeColor,
+
+                            highlight: "#60a5fa",
+
+                            hover: "#93c5fd"
+
+                        },
+
+                        title:
+                            `<b>Transaction</b><br>
+                            ${transaction.sender}
+                            → 
+                            ${transaction.receiver}<br>
+                            Amount: ${amount.toFixed(2)}<br>
+                            Time: ${transaction.timestamp}`,
+
+                        font: {
+
+                            color: "#94a3b8",
+
+                            size: 10,
+
+                            strokeWidth: 0
+
+                        },
+
+                        smooth: {
+
+                            type: "curvedCW",
+
+                            roundness: 0.15
+
+                        }
+
+                    });
+
+                }
             );
 
 
-        // ======================================
-        // Graph Data
-        // ======================================
+            // ======================================
+            // Graph Container
+            // ======================================
 
-        const data = {
-
-            nodes:
-                new vis.DataSet(nodes),
-
-            edges:
-                new vis.DataSet(edges)
-
-        };
+            const container =
+                document.getElementById(
+                    "transaction-graph"
+                );
 
 
-        // ======================================
-        // Graph Options
-        // ======================================
+            // ======================================
+            // Graph Data
+            // ======================================
 
-        const options = {
+            const data = {
 
-            autoResize:
-                true,
+                nodes:
+                    new vis.DataSet(nodes),
 
-            physics: {
+                edges:
+                    new vis.DataSet(edges)
 
-                enabled:
-                    true,
+            };
 
-                stabilization: {
 
-                    enabled:
-                        true,
+            // ======================================
+            // Graph Options
+            // ======================================
 
-                    iterations:
-                        250
+            const options = {
+
+                autoResize: true,
+
+                physics: {
+
+                    enabled: true,
+
+                    stabilization: {
+
+                        enabled: true,
+
+                        iterations: 250
+
+                    },
+
+                    barnesHut: {
+
+                        gravitationalConstant: -3500,
+
+                        centralGravity: 0.15,
+
+                        springLength: 190,
+
+                        springConstant: 0.04,
+
+                        damping: 0.09,
+
+                        avoidOverlap: 0.7
+
+                    }
 
                 },
 
-                barnesHut: {
 
-                    gravitationalConstant:
-                        -3500,
+                interaction: {
 
-                    centralGravity:
-                        0.15,
+                    hover: true,
 
-                    springLength:
-                        190,
+                    tooltipDelay: 150,
 
-                    springConstant:
-                        0.04,
+                    zoomView: true,
 
-                    damping:
-                        0.09,
+                    dragView: true,
 
-                    avoidOverlap:
-                        0.7
+                    dragNodes: true,
 
-                }
+                    navigationButtons: true,
 
-            },
+                    keyboard: true,
 
-            interaction: {
+                    multiselect: false
 
-                hover:
-                    true,
+                },
 
-                tooltipDelay:
-                    150,
 
-                zoomView:
-                    true,
+                nodes: {
 
-                dragView:
-                    true,
+                    shape: "dot",
 
-                dragNodes:
-                    true,
+                    scaling: {
 
-                navigationButtons:
-                    true,
+                        min: 18,
 
-                keyboard:
-                    true,
+                        max: 40
 
-                multiselect:
-                    false
+                    }
 
-            },
+                },
 
-            nodes: {
 
-                shape:
-                    "dot",
+                edges: {
 
-                scaling: {
+                    selectionWidth: 3,
 
-                    min:
-                        18,
+                    hoverWidth: 2,
 
-                    max:
-                        40
+                    smooth: {
+
+                        enabled: true
+
+                    }
 
                 }
 
-            },
+            };
 
-            edges: {
 
-                selectionWidth:
-                    3,
+            // ======================================
+            // Create Network
+            // ======================================
 
-                hoverWidth:
-                    2,
+            const network =
+                new vis.Network(
+                    container,
+                    data,
+                    options
+                );
 
-                smooth: {
 
-                    enabled:
-                        true
+            // ======================================
+            // Click Wallet
+            // ======================================
+
+            network.on(
+                "click",
+                function(params) {
+
+                    // Nothing selected
+
+                    if (
+                        params.nodes.length === 0 &&
+                        params.edges.length === 0
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    // Wallet clicked
+
+                    if (
+                        params.nodes.length > 0
+                    ) {
+
+                        const walletId =
+                            params.nodes[0];
+
+
+                        showWalletDetails(
+                            walletId
+                        );
+
+                        return;
+
+                    }
+
+
+                    // Transaction clicked
+
+                    if (
+                        params.edges.length > 0
+                    ) {
+
+                        const edgeId =
+                            params.edges[0];
+
+
+                        const transaction =
+                            transactionData
+                                .transactions[
+                                    edgeId
+                                ];
+
+
+                        if (transaction) {
+
+                            alert(
+                                `Transaction\n\n` +
+                                `${transaction.sender} → ` +
+                                `${transaction.receiver}\n` +
+                                `Amount: ${transaction.amount}\n` +
+                                `Time: ${transaction.timestamp}`
+                            );
+
+                        }
+
+                    }
 
                 }
-
-            }
-
-        };
-
-
-        // ======================================
-        // Create Network
-        // ======================================
-
-        const network =
-            new vis.Network(
-                container,
-                data,
-                options
             );
 
 
-        // ======================================
-        // Click Wallet / Transaction
-        // ======================================
+            // ======================================
+            // Double Click: Reset View
+            // ======================================
 
-        network.on(
-            "click",
-            function(params) {
+            network.on(
+                "doubleClick",
+                function() {
 
-                if (
-                    params.nodes.length === 0 &&
-                    params.edges.length === 0
-                ) {
+                    network.fit({
 
-                    return;
+                        animation: {
 
-                }
+                            duration: 800,
 
+                            easingFunction:
+                                "easeInOutQuad"
 
-                // Wallet clicked
+                        }
 
-                if (
-                    params.nodes.length > 0
-                ) {
-
-                    const walletId =
-                        params.nodes[0];
-
-
-                    showWalletDetails(
-                        walletId
-                    );
-
-                    return;
+                    });
 
                 }
+            );
 
 
-                // Transaction clicked
+        }
 
-                if (
-                    params.edges.length > 0
-                ) {
+        catch (error) {
 
-                    const edgeId =
-                        params.edges[0];
+            console.error(
+                "Failed to load transaction graph:",
+                error
+            );
 
-
-                    const transaction =
-                        transactionData
-                            .transactions[
-                                edgeId
-                            ];
-
-
-                    if (transaction) {
-
-                        alert(
-                            `Transaction\n\n` +
-                            `${transaction.sender} → ` +
-                            `${transaction.receiver}\n` +
-                            `Amount: ${transaction.amount}\n` +
-                            `Time: ${transaction.timestamp}`
-                        );
-
-                    }
-
-                }
-
-            }
-        );
-
-
-        // ======================================
-        // Double Click: Reset View
-        // ======================================
-
-        network.on(
-            "doubleClick",
-            function() {
-
-                network.fit({
-
-                    animation: {
-
-                        duration:
-                            800,
-
-                        easingFunction:
-                            "easeInOutQuad"
-
-                    }
-
-                });
-
-            }
-        );
+        }
 
     }
 
-    catch (error) {
-
-        console.error(
-            "Failed to load transaction graph:",
-            error
-        );
-
-    }
-
-}
 
 
-// ==========================================
-// Load Graph-Based Suspicious Wallets
+    // ==========================================
+// Load Suspicious Wallets
 // ==========================================
 
 async function loadSuspiciousWallets() {
 
     try {
 
-        // ======================================
-        // Fetch Graph Analysis
-        // ======================================
-
         const response =
             await fetch(
-                `${API_URL}/api/graph-analysis`
+                `${API_URL}/api/suspicious-wallets`
             );
 
 
         if (!response.ok) {
 
             throw new Error(
-                "Failed to fetch graph analysis"
+                "Failed to fetch suspicious wallets"
             );
 
         }
@@ -1187,19 +1120,8 @@ async function loadSuspiciousWallets() {
             await response.json();
 
 
-        // ======================================
-        // Filter Suspicious Wallets
-        // ======================================
-
         const wallets =
-            data.wallets.filter(
-
-                wallet =>
-
-                    wallet.risk_level === "HIGH" ||
-                    wallet.combined_risk_score >= 40
-
-            );
+            data.wallets;
 
 
         // ======================================
@@ -1234,7 +1156,7 @@ async function loadSuspiciousWallets() {
                 <tr>
 
                     <td
-                        colspan="9"
+                        colspan="7"
                         class="no-suspicious-wallets"
                     >
 
@@ -1266,7 +1188,8 @@ async function loadSuspiciousWallets() {
 
 
             if (
-                wallet.risk_level === "HIGH"
+                wallet.risk_level ===
+                "HIGH"
             ) {
 
                 badgeClass =
@@ -1275,7 +1198,8 @@ async function loadSuspiciousWallets() {
             }
 
             else if (
-                wallet.risk_level === "MEDIUM"
+                wallet.risk_level ===
+                "MEDIUM"
             ) {
 
                 badgeClass =
@@ -1284,9 +1208,9 @@ async function loadSuspiciousWallets() {
             }
 
 
-            // ==================================
-            // Detection Signals
-            // ==================================
+            // ----------------------------------
+            // Detection signals
+            // ----------------------------------
 
             const signals =
                 wallet.suspicion_reasons
@@ -1303,10 +1227,6 @@ async function loadSuspiciousWallets() {
                     })
                     .join("");
 
-
-            // ==================================
-            // Create Row
-            // ==================================
 
             row.innerHTML = `
 
@@ -1327,41 +1247,11 @@ async function loadSuspiciousWallets() {
                 <td>
 
                     <span
-                        class="analysis-score"
+                        class="suspicious-score"
                     >
 
                         ${Number(
-                            wallet.ml_risk_score
-                        ).toFixed(2)}
-
-                    </span>
-
-                </td>
-
-
-                <td>
-
-                    <span
-                        class="analysis-score graph-score"
-                    >
-
-                        ${Number(
-                            wallet.graph_suspicion_score
-                        ).toFixed(2)}
-
-                    </span>
-
-                </td>
-
-
-                <td>
-
-                    <span
-                        class="combined-score"
-                    >
-
-                        ${Number(
-                            wallet.combined_risk_score
+                            wallet.risk_score
                         ).toFixed(2)}
 
                     </span>
@@ -1384,7 +1274,15 @@ async function loadSuspiciousWallets() {
 
                 <td>
 
-                    ${wallet.connections}
+                    ${Number(
+                        wallet.total_volume
+                    ).toLocaleString(
+                        undefined,
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}
 
                 </td>
 
@@ -1398,7 +1296,7 @@ async function loadSuspiciousWallets() {
 
                 <td>
 
-                    ${wallet.reciprocal_wallets}
+                    ${wallet.connections}
 
                 </td>
 
@@ -1419,7 +1317,7 @@ async function loadSuspiciousWallets() {
 
 
             // ==================================
-            // Open Wallet Details
+            // Wallet Click
             // ==================================
 
             row.querySelector(
@@ -1448,7 +1346,7 @@ async function loadSuspiciousWallets() {
     catch (error) {
 
         console.error(
-            "Failed to load graph analysis:",
+            "Failed to load suspicious wallets:",
             error
         );
 
@@ -1457,12 +1355,8 @@ async function loadSuspiciousWallets() {
 }
 
 
-// ==========================================
-// Start Application
-// ==========================================
-
 loadWallets();
-
 loadSuspiciousWallets();
-
 loadTransactionGraph();
+
+
