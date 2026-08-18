@@ -1090,7 +1090,273 @@ document.addEventListener(
         }
 
     }
+
+
+
+    // ==========================================
+// Load Suspicious Wallets
+// ==========================================
+
+async function loadSuspiciousWallets() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/api/suspicious-wallets`
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to fetch suspicious wallets"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const wallets =
+            data.wallets;
+
+
+        // ======================================
+        // Update Count
+        // ======================================
+
+        document.getElementById(
+            "suspicious-count"
+        ).textContent =
+            `${wallets.length} detected`;
+
+
+        const table =
+            document.getElementById(
+                "suspicious-table"
+            );
+
+
+        table.innerHTML = "";
+
+
+        // ======================================
+        // Empty State
+        // ======================================
+
+        if (
+            wallets.length === 0
+        ) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        class="no-suspicious-wallets"
+                    >
+
+                        ✓ No suspicious wallets detected
+
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+        // ======================================
+        // Create Rows
+        // ======================================
+
+        wallets.forEach(wallet => {
+
+            const row =
+                document.createElement("tr");
+
+
+            let badgeClass =
+                "badge-low";
+
+
+            if (
+                wallet.risk_level ===
+                "HIGH"
+            ) {
+
+                badgeClass =
+                    "badge-high";
+
+            }
+
+            else if (
+                wallet.risk_level ===
+                "MEDIUM"
+            ) {
+
+                badgeClass =
+                    "badge-medium";
+
+            }
+
+
+            // ----------------------------------
+            // Detection signals
+            // ----------------------------------
+
+            const signals =
+                wallet.suspicion_reasons
+                    .map(reason => {
+
+                        return `
+
+                            <span class="signal">
+                                • ${reason}
+                            </span>
+
+                        `;
+
+                    })
+                    .join("");
+
+
+            row.innerHTML = `
+
+                <td>
+
+                    <button
+                        class="suspicious-wallet-button"
+                        type="button"
+                    >
+
+                        ${wallet.wallet}
+
+                    </button>
+
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="suspicious-score"
+                    >
+
+                        ${Number(
+                            wallet.risk_score
+                        ).toFixed(2)}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="badge ${badgeClass}"
+                    >
+
+                        ${wallet.risk_level}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    ${Number(
+                        wallet.total_volume
+                    ).toLocaleString(
+                        undefined,
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    )}
+
+                </td>
+
+
+                <td>
+
+                    ${wallet.large_transactions}
+
+                </td>
+
+
+                <td>
+
+                    ${wallet.connections}
+
+                </td>
+
+
+                <td>
+
+                    <div
+                        class="signal-list"
+                    >
+
+                        ${signals}
+
+                    </div>
+
+                </td>
+
+            `;
+
+
+            // ==================================
+            // Wallet Click
+            // ==================================
+
+            row.querySelector(
+                ".suspicious-wallet-button"
+            ).addEventListener(
+
+                "click",
+
+                () => {
+
+                    showWalletDetails(
+                        wallet.wallet
+                    );
+
+                }
+
+            );
+
+
+            table.appendChild(row);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Failed to load suspicious wallets:",
+            error
+        );
+
+    }
+
+}
+
+
 loadWallets();
+loadSuspiciousWallets();
 loadTransactionGraph();
 
 

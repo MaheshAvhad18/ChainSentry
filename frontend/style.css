@@ -892,3 +892,159 @@ tbody tr:hover {
     }
 
 }
+
+
+/* ==========================================
+   Suspicious Wallets
+========================================== */
+
+.suspicious-section {
+
+    margin-top: 35px;
+
+    background: #111827;
+
+    border: 1px solid #451a1a;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+}
+
+
+.suspicious-section .section-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+.suspicious-section h2 {
+
+    color: #f87171;
+
+}
+
+
+.suspicious-count {
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    background: #451a1a;
+
+    color: #f87171;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+}
+
+
+/* ==========================================
+   Suspicious Wallet Button
+========================================== */
+
+.suspicious-wallet-button {
+
+    background: transparent;
+
+    border: none;
+
+    color: #f87171;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    padding: 0;
+
+}
+
+
+.suspicious-wallet-button:hover {
+
+    color: #fca5a5;
+
+    text-decoration: underline;
+
+}
+
+
+/* ==========================================
+   Suspicion Signals
+========================================== */
+
+.signal-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+}
+
+
+.signal {
+
+    display: inline-block;
+
+    color: #fbbf24;
+
+    font-size: 12px;
+
+}
+
+
+/* ==========================================
+   Suspicious Risk Score
+========================================== */
+
+.suspicious-score {
+
+    color: #f87171;
+
+    font-weight: bold;
+
+}
+
+
+/* ==========================================
+   Empty State
+========================================== */
+
+.no-suspicious-wallets {
+
+    text-align: center;
+
+    padding: 35px;
+
+    color: #22c55e;
+
+}
+
+
+@media (max-width: 800px) {
+
+    .suspicious-section
+    .section-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 12px;
+
+    }
+
+}
